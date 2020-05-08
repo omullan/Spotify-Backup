@@ -1,0 +1,31 @@
+added react, now returns json of playlists
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch master
+# Your branch is up to date with 'origin/master'.
+#
+# Changes to be committed:
+#	modified:   authorization_code/app.js
+#	modified:   authorization_code/public/index.html
+#	new file:   my-app/.gitignore
+#	new file:   my-app/README.md
+#	new file:   my-app/package-lock.json
+#	new file:   my-app/package.json
+#	new file:   my-app/public/favicon.ico
+#	new file:   my-app/public/index.html
+#	new file:   my-app/public/logo192.png
+#	new file:   my-app/public/logo512.png
+#	new file:   my-app/public/manifest.json
+#	new file:   my-app/public/robots.txt
+#	new file:   my-app/src/App.css
+#	new file:   my-app/src/App.js
+#	new file:   my-app/src/App.test.js
+#	new file:   my-app/src/index.css
+#	new file:   my-app/src/index.js
+#	new file:   my-app/src/logo.svg
+#	new file:   my-app/src/serviceWorker.js
+#	new file:   my-app/src/setupTests.js
+#	modified:   package-lock.json
+#	modified:   package.json
+#
