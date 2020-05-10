@@ -1,20 +1,26 @@
 import React, { Component } from 'react';
 import './App.css';
 import SpotifyWebApi from 'spotify-web-api-js';
+import axios from 'axios';
 
 const spotifyApi = new SpotifyWebApi();
 
-function TrackObj(name, artist, length) {
-  this.name = name;
-  this.artist = artist;
-  this.length = length;
+class TrackObj{
+  constructor (name, artist, length) {
+    this.name = name;
+    this.artist = artist;
+    this.length = length;
+  }
 }
 
-function PlaylistObj(name, length, tracksURL) {
-  this.name = name;
-  this.length = length;
-  this.tracksURL = tracksURL;
-  //this.tracks = tracks;
+class PlaylistObj {
+  constructor (name, length, tracksURL, tracks) {
+    this.name = name;
+    this.length = length;
+    this.tracksURL = tracksURL;
+    this.tracks = tracks;
+    
+  }
 }
 
 class App extends Component {
@@ -40,32 +46,37 @@ class App extends Component {
     return hashParams;
   }
 
-  getPlaylists() {
-    spotifyApi.getUserPlaylists().then(
-        function (data) {
-          var playlistArray = [];
-          for(let i = 0; i < data.items.length; i++) {
-            var playlist = new PlaylistObj(data.items[i].name, data.items[i].tracks.total, data.items[i].tracks.href);
-            playlistArray[i] = playlist;
-            console.log(playlistArray[i]);
-          }
-          return playlistArray;
-        },
-        function (err) {
-          console.error(err);
-        }
-    );
+  getPlaylists = async() => {
+    var data = await spotifyApi.getUserPlaylists();
+    console.log(data);
+    var playlistArray = [];
+    for(let i = 0; i < data.items.length; i++) {
+      var tracksURL = data.items[i].tracks.href.slice(37,59);
+      var tracks = await this.getPlaylistTracks_2(tracksURL);
+      var playlist = new PlaylistObj(data.items[i].name, data.items[i].tracks.total, tracksURL, tracks);
+      playlistArray[i] = playlist;
+    }
+    console.log(playlistArray);
+    return playlistArray;
+  }
 
+  getPlaylistTracks_2 = async (tracksURL) => {
+    var data = await spotifyApi.getPlaylistTracks(tracksURL);
+    var tracklist = [];
+      if(data.total <= 100) {
+        for(let i = 0; i < data.total; i++) {
+            var track = new TrackObj(data.items[i].track.name, data.items[i].track.artists[0].name, data.items[i].track.duration_ms);
+            tracklist[i] = track;
+          }
+        } 
+      return tracklist;
   }
-  getPlaylistTracks(PlaylistObj) {
-    
-  }
+
 
   render() {
     return (
       <div className='App'>
         <a href='http://localhost:8888'> Login to Spotify </a>
-        {this.getPlaylists()}
       </div>
 
     );
