@@ -3,6 +3,9 @@ import './App.css';
 import SpotifyWebApi from 'spotify-web-api-js';
 
 const spotifyApi = new SpotifyWebApi();
+//const csv = require('@fast-csv/parse');
+//const fs = require('fs');
+//const ws = fs.createWriteStream("\Spotify Backup\authorization_code\public\result.csv");
 
 class TrackObj{
   constructor (name, artist, length) {
@@ -79,6 +82,11 @@ class App extends Component {
   callFunctions() {
     var x = this.getPlaylists();
   }
+
+  //writeToFile() {
+  //  var data = this.getPlaylists();
+  //  csv.write(data, { headers: true }).pipe(ws);
+ // }
 
   render() {
     return (
