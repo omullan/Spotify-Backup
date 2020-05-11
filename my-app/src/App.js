@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import SpotifyWebApi from 'spotify-web-api-js';
-import axios from 'axios';
 
 const spotifyApi = new SpotifyWebApi();
 
@@ -31,7 +30,6 @@ class App extends Component {
     if (token) {
       spotifyApi.setAccessToken(token);
     }
-    console.log(params);
   }
   
   getHashParams() {
@@ -46,37 +44,49 @@ class App extends Component {
     return hashParams;
   }
 
-  getPlaylists = async() => {
+  getPlaylists = async () => {
     var data = await spotifyApi.getUserPlaylists();
-    console.log(data);
     var playlistArray = [];
     for(let i = 0; i < data.items.length; i++) {
       var tracksURL = data.items[i].tracks.href.slice(37,59);
-      var tracks = await this.getPlaylistTracks_2(tracksURL);
+      var tracks = await this.getPlaylistTracks(tracksURL);
       var playlist = new PlaylistObj(data.items[i].name, data.items[i].tracks.total, tracksURL, tracks);
       playlistArray[i] = playlist;
     }
     console.log(playlistArray);
-    return playlistArray;
+    return await playlistArray;
   }
 
-  getPlaylistTracks_2 = async (tracksURL) => {
+  getPlaylistTracks = async (tracksURL) => {
     var data = await spotifyApi.getPlaylistTracks(tracksURL);
     var tracklist = [];
       if(data.total <= 100) {
         for(let i = 0; i < data.total; i++) {
-            var track = new TrackObj(data.items[i].track.name, data.items[i].track.artists[0].name, data.items[i].track.duration_ms);
-            tracklist[i] = track;
+          var track = new TrackObj(data.items[i].track.name, data.items[i].track.artists[0].name, data.items[i].track.duration_ms);
+          tracklist[i] = track;
+        }
+      } else {
+        for(let i = 0; i < data.total; i=i+100) {
+          var result = await spotifyApi.getPlaylistTracks(tracksURL, {offset: i});
+          for(let j = 0; j < 100 && result.items[j] != null; j++) {
+            var track = new TrackObj(result.items[j].track.name, result.items[j].track.artists[0].name, result.items[j].track.duration_ms);
+            tracklist[i+j] = track;
           }
-        } 
+        }
+      }
       return tracklist;
   }
-
+  callFunctions() {
+    var x = this.getPlaylists();
+  }
 
   render() {
     return (
       <div className='App'>
-        <a href='http://localhost:8888'> Login to Spotify </a>
+        <div>
+          <a href='http://localhost:8888'> Login to Spotify </a>
+          {this.callFunctions()}
+        </div>
       </div>
 
     );
