@@ -3,9 +3,6 @@ import './App.css';
 import SpotifyWebApi from 'spotify-web-api-js';
 
 const spotifyApi = new SpotifyWebApi();
-//const csv = require('@fast-csv/parse');
-//const fs = require('fs');
-//const ws = fs.createWriteStream("\Spotify Backup\authorization_code\public\result.csv");
 
 class TrackObj{
   constructor (name, artist, length) {
@@ -56,7 +53,6 @@ class App extends Component {
       var playlist = new PlaylistObj(data.items[i].name, data.items[i].tracks.total, tracksURL, tracks);
       playlistArray[i] = playlist;
     }
-    console.log(playlistArray);
     return await playlistArray;
   }
 
@@ -79,21 +75,59 @@ class App extends Component {
       }
       return tracklist;
   }
-  callFunctions() {
-    var x = this.getPlaylists();
+  callFunctions = async () => {
+    var x = await this.getPlaylists();
+    var y = this.formatForWrite(x);
+    var z = this.writeToFile(y);
   }
 
-  //writeToFile() {
-  //  var data = this.getPlaylists();
-  //  csv.write(data, { headers: true }).pipe(ws);
- // }
+  call() {
+    this.callFunctions();
+  }
+
+  formatForWrite(playlistArray) {
+    var formattedData = [];
+    var index = 0;
+    for(let i = 0; i < playlistArray.length; i++) {
+      var data = [playlistArray[i].name, playlistArray[i].length.toString(),playlistArray[i].tracksURL];
+      formattedData[index++] = data;
+      var space = [" ", " ", " "];
+      formattedData[index++] = space;
+      for(let j = 0; j < playlistArray[i].tracks.length; j++) {
+        var song = [playlistArray[i].tracks[j].name, playlistArray[i].tracks[j].artist, playlistArray[i].tracks[j].length.toString()];
+        formattedData[index++] = song;
+      }
+    }
+    console.log(formattedData);
+    return formattedData;
+  }
+  writeToFile(formattedData) {
+    var finalVal = '';
+    for (var i = 0; i < formattedData.length; i++) {
+      var value = formattedData[i];
+      for (var j = 0; j < value.length; j++) {
+        var innerValue = value[j];
+        var result = innerValue.replace(/"/g, '""');
+        if (result.search(/("|,|\n)/g) >= 0)
+            result = '"' + result + '"';
+        if (j > 0)
+            finalVal += ',';
+        finalVal += result;
+      }
+      finalVal += '\n';
+    }
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(finalVal));
+    pom.setAttribute('download', 'test.csv');
+    pom.click();
+  }
 
   render() {
     return (
       <div className='App'>
         <div>
           <a href='http://localhost:8888'> Login to Spotify </a>
-          {this.callFunctions()}
+          {this.call()}
         </div>
       </div>
 
